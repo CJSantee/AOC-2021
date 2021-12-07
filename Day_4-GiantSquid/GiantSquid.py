@@ -18,15 +18,20 @@ def checkCol(col, board):
             return False
     return True
 
-def checkWin(boards):
+def checkGameWin(boards):
     for n in range(len(boards)):
-        for row in range(len(boards[n])):
-            if checkRow(boards[n][row]) == True:
+        if checkBoardWin(boards[n]):
+            return True
+    return False
+
+def checkBoardWin(board):
+    for row in range(len(board)):
+        if checkRow(board[row]) == True:
+            return True
+    for col in range(len(board[0])):
+        if board[0][col][1] == True:
+            if checkCol(col, board) == True:
                 return True
-        for col in range(len(boards[n][0])):
-            if boards[n][0][col][1] == True:
-                if checkCol(col, boards[n]) == True:
-                    return True
     return False
 
 def sumUnmarked(board):
@@ -72,11 +77,10 @@ for turn in turns:
             for col in range(len(boards[n][row])):
                 if boards[n][row][col][0] == turn and not win:
                     boards[n][row][col] = (boards[n][row][col][0], True)
-                    if checkWin(boards):
+                    if checkGameWin(boards):
                         win = True
                         sum = sumUnmarked(boards[n])
                         print(turn*sum)
-                        
 
 # printBoards(boards)
 
@@ -92,18 +96,13 @@ countWins = 0
 winningBoards = set()
 for turn in turns:
     for n in range(len(boards)):
-        if n not in winningBoards: 
-            for row in range(len(boards[n])):
-                for col in range(len(boards[n][row])):
-                    if boards[n][row][col][0] == turn:
-                        boards[n][row][col] = (boards[n][row][col][0], True)
-                        if checkWin(boards):
-                            winningBoards.add(n)
-                            if len(winningBoards) == len(boards):
-                                sum = sumUnmarked(boards[n])
-                                print(sum)
-                                print(turn * sum)
-                                exit(1)
-                        
-                           
-
+        for row in range(len(boards[n])):
+            for col in range(len(boards[n][row])):
+                if boards[n][row][col][0] == turn and n not in winningBoards:
+                    boards[n][row][col] = (boards[n][row][col][0], True)
+    for n in range(len(boards)):
+        if checkBoardWin(boards[n]):
+            winningBoards.add(n)
+            if len(winningBoards) == len(boards):
+                print(sumUnmarked(boards[n])*turn)
+                exit(1)
